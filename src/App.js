@@ -99,33 +99,13 @@ function App() {
       );
     }
   }
-  // const horizontalMax = horizontalLines[horizontalLines.length - 1];
-  // const horizontalClip = `circle(1523.403218538857px at ${
-  //   horizontalMax.radius
-  // } ${yCenter + horizontalMax.radius - horizontalMax.center})`;
 
   const temporalHours = [];
   const hour = Math.PI / 12;
   for (let i = 1; i <= 5; i++) {
-    // Night
     const nightHourData = nightHours(i);
-    // const dayHourData = dayHours(i);
     temporalHours.push(
       ...[
-        // <line
-        //   key={`n${6 - i}`}
-        //   x1={nightHourData.startX}
-        //   y1={nightHourData.startY}
-        //   x2={nightHourData.endX}
-        //   y2={nightHourData.endY}
-        // />,
-        // <line
-        //   key={`n${6 + i}`}
-        //   x1={3200 - nightHourData.startX}
-        //   y1={nightHourData.startY}
-        //   x2={3200 - nightHourData.endX}
-        //   y2={nightHourData.endY}
-        // />,
         <path
           key={`n${6 - i}`}
           d={`M ${nightHourData.startX},${nightHourData.startY} a ${nightHourData.radius},${nightHourData.radius},0 0 1 ${nightHourData.xDistance},${nightHourData.yDistance}`}
@@ -138,37 +118,7 @@ function App() {
             nightHourData.yDistance
           }`}
         />,
-        // <path
-        //   key={`d${6 + i}`}
-        //   d={`M ${dayHourData.startX},${dayHourData.startY} a ${nightHourData.radius},${nightHourData.radius},0 0 0 ${dayHourData.xDistance},${dayHourData.yDistance}`}
-        // />,
-        // <path
-        //   key={`d${6 - i}`}
-        //   d={`M ${3200 - dayHourData.startX},${dayHourData.startY} a ${
-        //     nightHourData.radius
-        //   },${nightHourData.radius},0 0 1 ${0 - dayHourData.xDistance},${
-        //     dayHourData.yDistance
-        //   }`}
-        // />,
-        // <line
-        //   key={`d${6 + i}`}
-        //   x1={dayHourData.startX}
-        //   y1={dayHourData.startY}
-        //   x2={dayHourData.endX}
-        //   y2={dayHourData.endY}
-        // />,
-        // <line
-        //   key={`d${6 - i}`}
-        //   x1={3200 - dayHourData.startX}
-        //   y1={dayHourData.startY}
-        //   x2={3200 - dayHourData.endX}
-        //   y2={dayHourData.endY}
-        // />,
       ]
-      //   <path
-      //     key={i}
-      //     d={`M ${startX} , ${startY} a ${radius},${radius} 0 0,1 ${xDistance} ,${yDistance}`}
-      //   />
     );
   }
 
@@ -182,15 +132,9 @@ function App() {
     const radiusAngle = (6 - i) * hour;
     const radiusCenterDistance =
       (outerTropic - innerTropic) / Math.sin(i * temporalHourAngle) / 2;
-    // const radiusX = 1600 + radiusCenterDistance * Math.cos(radiusAngle);
-    // const radiusY = 1600 - radiusCenterDistance * Math.sin(radiusAngle);
     const radius = Math.sqrt(
       1000000 + radiusCenterDistance * radiusCenterDistance
     );
-    //   (radiusX - startX) * (radiusX - startX) +
-    //     (radiusY - startY) * (radiusY - startY)
-    // );
-    // console.log(radius);
     return {
       startX: startX,
       startY: startY,
@@ -201,23 +145,6 @@ function App() {
       radius: radius,
     };
   }
-
-  // function dayHours(i) {
-  //   const startX =
-  //     1600 + outerTropic * Math.sin(i * (temporalHourAngle - hour));
-  //   const startY =
-  //     1600 - outerTropic * Math.cos(i * (temporalHourAngle - hour));
-  //   const endX = 1600 - innerTropic * Math.sin(i * (temporalHourAngle + hour));
-  //   const endY = 1600 - innerTropic * Math.cos(i * (temporalHourAngle + hour));
-  //   return {
-  //     startX: startX,
-  //     startY: startY,
-  //     endX: endX,
-  //     endY: endY,
-  //     xDistance: endX - startX,
-  //     yDistance: endY - startY,
-  //   };
-  // }
 
   /**
    * directional Lines:
@@ -231,86 +158,118 @@ function App() {
   const upperRange =
     Math.asin((yCenter - eqHorizon) / outerTropic) + Math.PI / 2;
   const directionalLines = [];
+  const cy = 682.8873121387942;
+  const r = 1356.8698103488061;
   for (let i = 1; i < 18; i++) {
-    const angleCorrection =
-      Math.atan(cosHorizontal * Math.tan(i * tenDegrees)) +
-      Math.floor((i + 8) / 18) * Math.PI;
-    const cy = 682.8873121387942;
-    let x2;
-    let y2;
+    const firstPoint = getDirectionalPoint(i);
+    const secondPoint = getDirectionalPoint(18 - i, false);
+    const radius = getDirectionalRadius(firstPoint, secondPoint, i);
 
-    if (angleCorrection > upperRange) {
-      // console.log("to big", i);
-      x2 = xCenter + Math.sin(angleCorrection) * outerTropic;
-      y2 = yCenter + Math.cos(angleCorrection) * outerTropic;
-      // directionalLines.push(
-      //   <line
-      //     key={`d${i}`}
-      //     x1={xCenter}
-      //     y1={horizontalCenter}
-      //     x2={xCenter + Math.sin(angleCorrection) * outerTropic}
-      //     y2={yCenter + Math.cos(angleCorrection) * outerTropic}
-      //   />
-      // );
-    } else {
-      const r = 1356.8698103488061;
-      const gamma = Math.asin(
-        ((1600 - cy) * Math.sin(Math.PI - angleCorrection)) / r
-      );
-      const beta = angleCorrection - gamma;
-      // if (i > 9) {
-      //   beta = Math.PI - beta;
-      // }
-      // const a = angleCorrection * angleCorrection + 1;
-      // const b =
-      //   2 * angleCorrection * xCenter -
-      //   2 * angleCorrection * angleCorrection * xCenter -
-      //   2 * cy;
-      // const c =
-      //   angleCorrection * angleCorrection * xCenter * xCenter +
-      //   xCenter * xCenter -
-      //   2 * angleCorrection * xCenter * xCenter +
-      //   cy * cy +
-      //   2 * xCenter +
-      //   xCenter * xCenter -
-      //   2 * angleCorrection * xCenter * xCenter -
-      //   r * r;
-      //   const pqTerm = Math.sqrt(b*b-4*a*c);
-      //   const sol1 = (-b+pqTerm)/(2*a);
-      //   const sol2 = (-b-pqTerm)/(2*a);
-      // console.log(i, sol1, sol2);
-      // directionalLines.push(
-      //   <line
-      //     key={`d${i}`}
-      //     x1={xCenter}
-      //     y1={horizontalCenter}
-      //     x2={xCenter + Math.sin(beta) * r}
-      //     y2={cy + Math.cos(beta) * r}
-      //   />
-      // );
-      x2 = xCenter + Math.sin(beta) * r;
-      y2 = cy + Math.cos(beta) * r;
-    }
-
-    const xDistance = x2 - xCenter;
-    const yDistance = y2 - horizontalCenter;
-    const spiegelAngle = Math.atan2(xDistance, yDistance)+((9-i)*tenDegrees);
-    const radius = Math.sqrt(xDistance*xDistance+yDistance*yDistance)*Math.sin(spiegelAngle)/Math.sin(Math.PI-2*spiegelAngle);
-    console.log(radius);
+    const xDistance = secondPoint.x - firstPoint.x;
+    const yDistance = secondPoint.y - firstPoint.y;
+    // const spiegelAngle =
+    //   Math.atan2(xDistance, yDistance) + (9 - i) * tenDegrees;
+    // const radius =
+    //   (Math.sqrt(xDistance * xDistance + yDistance * yDistance) *
+    //     Math.sin(spiegelAngle)) /
+    //   Math.sin(Math.PI - 2 * spiegelAngle);
+    // console.log(radius);
     directionalLines.push(
+      // <line
+      //   x1={firstPoint.x}
+      //   y1={firstPoint.y}
+      //   x2={secondPoint.x}
+      //   y2={secondPoint.y}
+      // />
       <path
-        key={`d${360 - i * 10}`}
-        d={`M ${xCenter},${horizontalCenter} a ${radius},${radius},0 0 1 ${xDistance},${yDistance}`}
+        key={`d${i * 10}`}
+        d={`M ${firstPoint.x},${firstPoint.y} a ${radius},${radius},0 0 0 ${xDistance},${yDistance}`}
       />
     );
   }
 
-  const test = [];
-  for (let i = 0; i < 24; i++) {
-    const x2 = 1600 + 1600 * Math.sin((i * Math.PI) / 12);
-    const y2 = 1600 - 1600 * Math.cos((i * Math.PI) / 12);
-    test.push(<line x1="1600" y1="1600" x2={x2} y2={y2} />);
+  function getDirectionalPoint(i, right = true) {
+    const angleCorrection =
+      Math.atan(cosHorizontal * Math.tan(i * tenDegrees)) +
+      Math.floor((i + 8) / 18) * Math.PI;
+    let x;
+    let y;
+    if (angleCorrection > upperRange) {
+      x = xCenter + Math.sin(angleCorrection) * outerTropic;
+      y = yCenter + Math.cos(angleCorrection) * outerTropic;
+    } else {
+      const gamma = Math.asin(
+        ((1600 - cy) * Math.sin(Math.PI - angleCorrection)) / r
+      );
+      const beta = angleCorrection - gamma;
+      x = xCenter + Math.sin(beta) * r;
+      y = cy + Math.cos(beta) * r;
+    }
+    return { x: right ? x : 3200 - x, y: y, angle: angleCorrection };
   }
+
+  /**
+   * y = ax+b
+   * y = cx+d
+   * ax+b = cx+d
+   * ax-cx = d-b
+   * x(a-c) = d-b
+   * x = (d-b)/(a-c)
+   * y = tan(-i)x+y0-tan(-i)*x0
+   * b = y0-a*x0
+   * a = (yb-ya)/(xb-xa)
+   * @param {Object{x: double, y: double}} firstPoint
+   * @param {Object{x: double, y: double}} secondPoint
+   */
+  function getDirectionalRadius({ x: x1, y: y1 }, { x: x2, y: y2 }, i) {
+    // const firstFactor = Math.tan(-i * tenDegrees);
+    // const firstCoefficient = horizontalCenter - firstFactor * xCenter;
+    const firstFactor = (xCenter - x1) / (y1 - horizontalCenter);
+    const firstCoefficient =
+      (y1 + horizontalCenter) / 2 - (firstFactor * (x1 + xCenter)) / 2;
+    const secondFactor = (xCenter - x2) / (y2 - horizontalCenter);
+    const secondCoefficient =
+      (y2 + horizontalCenter) / 2 - (secondFactor * (x2 + xCenter)) / 2;
+    // const secondFactor = (x2 - x1) / (y1 - y2);
+    // const secondCoefficient = (y1 + y2) / 2 - (secondFactor * (x1 + x2)) / 2;
+    const x =
+      (secondCoefficient - firstCoefficient) / (firstFactor - secondFactor);
+    const y = firstFactor * x + firstCoefficient;
+    console.log(x,x1,y,y1);
+    // directionalLines.push(...[
+    //   <line
+    //     x1={0}
+    //     y1={firstCoefficient}
+    //     x2={3200}
+    //     y2={3200 * firstFactor + firstCoefficient}
+    //   />,
+    //   <line
+    //     x1={0}
+    //     y1={secondCoefficient}
+    //     x2={3200}
+    //     y2={3200 * secondFactor + secondCoefficient}
+    //   />,
+    //   <line
+    //     x1={x1}
+    //     y1={y1}
+    //     x2={x2}
+    //     y2={y2}
+    //   />,
+    // ]);
+    const radius = Math.sqrt(
+      Math.pow(y - horizontalCenter, 2) + Math.pow(x - xCenter, 2)
+    );
+    return radius;
+  }
+
+  // directionalLines.push([
+  //   <line x1={0} y1={horizontalCenter} x2={3200} y2={horizontalCenter} />,
+  // ]);
+  // for (let i = 0; i < 24; i++) {
+  //   const x2 = 1600 + 1600 * Math.sin((i * Math.PI) / 12);
+  //   const y2 = 1600 - 1600 * Math.cos((i * Math.PI) / 12);
+  //   test.push(<line x1="1600" y1="1600" x2={x2} y2={y2} />);
+  // }
 
   return (
     // <img src={logo} />
