@@ -1,0 +1,16 @@
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #505868;
+  border-radius: 0 0 0.5rem 0;
+  cursor: pointer;
+  border: 1px solid aliceblue;
+  color: aliceblue;
+}
+
+.hamburger {
+  height: 3rem;
+  min-width: 3rem;
+  text-align: center;
+}
