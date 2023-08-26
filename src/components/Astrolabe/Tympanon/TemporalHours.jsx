@@ -1,3 +1,4 @@
+import { kWidth, xCenter, yCenter } from "../../../utils/constants";
 import { stereoProject, toRad } from "../../../utils/math";
 
 const TemporalHours = () => {
@@ -13,7 +14,6 @@ const TemporalHours = () => {
   const innerTropic = equatorRadius / tropicalFactor;
   const outerTropic = equatorRadius * tropicalFactor;
 
-  const yCenter = 1600;
   const netherLine = equatorRadius * stereoProject(toRad(latitude - 90));
   const upperLine = equatorRadius * stereoProject(toRad(latitude + 90));
   const radius = (netherLine - upperLine) / 2;
@@ -38,7 +38,7 @@ const TemporalHours = () => {
         />,
         <path
           key={`n${6 + i}`}
-          d={`M ${3200 - nightHourData.startX},${nightHourData.startY} a ${
+          d={`M ${kWidth - nightHourData.startX},${nightHourData.startY} a ${
             nightHourData.radius
           },${nightHourData.radius},0 0 0 ${0 - nightHourData.xDistance},${
             nightHourData.yDistance
@@ -50,11 +50,11 @@ const TemporalHours = () => {
 
   function nightHours(i) {
     const startX =
-      1600 + outerTropic * Math.sin(i * (temporalHourAngle + hour));
+      xCenter + outerTropic * Math.sin(i * (temporalHourAngle + hour));
     const startY =
-      1600 + outerTropic * Math.cos(i * (temporalHourAngle + hour));
-    const endX = 1600 - innerTropic * Math.sin(i * (temporalHourAngle - hour));
-    const endY = 1600 + innerTropic * Math.cos(i * (temporalHourAngle - hour));
+      yCenter + outerTropic * Math.cos(i * (temporalHourAngle + hour));
+    const endX = xCenter - innerTropic * Math.sin(i * (temporalHourAngle - hour));
+    const endY = yCenter + innerTropic * Math.cos(i * (temporalHourAngle - hour));
     const radiusCenterDistance =
       (outerTropic - innerTropic) / Math.sin(i * temporalHourAngle) / 2;
     const radius = Math.sqrt(

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { xCenter, yCenter } from "../../../utils/constants";
 
 const Rete = () => {
   let longitude = 8.222566666666667;
@@ -16,12 +17,12 @@ const Rete = () => {
   });
 
   return (
-    <g id="rete" transform={`rotate(${siderealTime},1600,1600)`}>
+    <g id="rete" transform={`rotate(${siderealTime},${xCenter},${yCenter})`}>
       <g id="eclipticCircle">
         <circle
           id="ecliptic"
-          cx="1600"
-          cy="1166.5109046043215"
+          cx={xCenter}
+          cy="1766.5109046043215"
           r="1089.9141231431786"
           strokeWidth="3"
         />

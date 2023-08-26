@@ -1,10 +1,9 @@
+import { kWidth, xCenter, yCenter } from "../../../utils/constants";
 import { stereoProject, toRad } from "../../../utils/math";
 
 const Azimuth = () => {
   let latitude = /* 0.01; // */ 47.4756694444444445;
 
-  const xCenter = 1600;
-  const yCenter = 1600;
   const eclipticAngle = 23.436206;
   const eclipticRadAngle = toRad(eclipticAngle);
   const equatorRadius = 1000;
@@ -35,7 +34,7 @@ const Azimuth = () => {
   const upperRange =
     Math.asin((yCenter - eqHorizon) / outerTropic) + Math.PI / 2;
   const azimuthLines = [];
-  const cy = 682.8873121387942;
+  const cy = 1282.8873121387942;
   const r = 1356.8698103488061;
   for (let i = 1; i < 18; i++) {
     const firstPoint = getDirectionalPoint(i);
@@ -63,13 +62,13 @@ const Azimuth = () => {
       y = yCenter + Math.cos(angleCorrection) * outerTropic;
     } else {
       const gamma = Math.asin(
-        ((1600 - cy) * Math.sin(Math.PI - angleCorrection)) / r
+        ((yCenter/* oder ?*/ - cy) * Math.sin(Math.PI - angleCorrection)) / r
       );
       const beta = angleCorrection - gamma;
       x = xCenter + Math.sin(beta) * r;
       y = cy + Math.cos(beta) * r;
     }
-    return { x: right ? x : 3200 - x, y: y, angle: angleCorrection };
+    return { x: right ? x : kWidth - x, y: y, angle: angleCorrection };
   }
 
   /**

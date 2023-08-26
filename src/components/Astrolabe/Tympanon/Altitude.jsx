@@ -1,10 +1,11 @@
+import { xCenter, yCenter } from "../../../utils/constants";
 import { stereoProject, toRad } from "../../../utils/math";
 
 const Altitude = () => {
   let latitude =  47.4756694444444445;
 
-  const xCenter = 1600;
-  const yCenter = 1600;
+  // const xCenter = 1600;
+  // const yCenter = 1600;
   const eclipticAngle = 23.436206;
   const eclipticRadAngle = toRad(eclipticAngle);
   const equatorRadius = 1000;
@@ -42,7 +43,7 @@ const Altitude = () => {
           center * center) /
         (2 * (center - yCenter));
       const startingX =
-        1600 +
+        xCenter +
         Math.sqrt(
           outerTropic * outerTropic - (yCenter - yLine) * (yCenter - yLine)
         );
@@ -60,7 +61,7 @@ const Altitude = () => {
       altitudeCircles.push(
         <circle
           key={i}
-          cx="1600"
+          cx={xCenter}
           cy={center.toString()}
           r={radius.toString()}
         />
