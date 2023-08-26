@@ -11,8 +11,8 @@ const Rete = () => {
   const [siderealTime, setSiderealTime] = useState(getSiderealTime());
 
   useEffect(() => {
-    const timer = setTimeout(() => setSiderealTime(getSiderealTime()), 2000);
-    return () => clearTimeout(timer);
+    const interval = setInterval(() => setSiderealTime(getSiderealTime()), 5000);
+    return () => clearInterval(interval);
   });
 
   return (
