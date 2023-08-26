@@ -1,20 +1,20 @@
-import { xCenter, yCenter } from "../../../utils/constants";
+import { kRadius, xCenter, yCenter } from "../../../utils/constants";
 import { stereoProject, toRad } from "../../../utils/math";
 
 const Altitude = () => {
-  let latitude =  47.4756694444444445;
+  let latitude = 47.4756694444444445;
 
   // const xCenter = 1600;
   // const yCenter = 1600;
   const eclipticAngle = 23.436206;
   const eclipticRadAngle = toRad(eclipticAngle);
-  const equatorRadius = 1000;
+  const equatorRadius = kRadius;
   const tropicalFactor =
     Math.cos(eclipticRadAngle) / (1 - Math.sin(eclipticRadAngle));
   const outerTropic = equatorRadius * tropicalFactor;
 
   const altitudeCircles = [];
-  for (let i = 5; i <= 90; i += 5) {
+  for (let i = 2; i <= 90; i += 2) {
     const netherLine = equatorRadius * stereoProject(toRad(latitude - i));
     const upperLine = equatorRadius * stereoProject(toRad(latitude + i));
     const radius = (netherLine - upperLine) / 2;

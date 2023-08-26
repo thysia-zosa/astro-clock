@@ -12,7 +12,10 @@ const Rete = () => {
   const [siderealTime, setSiderealTime] = useState(getSiderealTime());
 
   useEffect(() => {
-    const interval = setInterval(() => setSiderealTime(getSiderealTime()), 5000);
+    const interval = setInterval(
+      () => setSiderealTime(getSiderealTime()),
+      5000
+    );
     return () => clearInterval(interval);
   });
 
@@ -22,7 +25,7 @@ const Rete = () => {
         <circle
           id="ecliptic"
           cx={xCenter}
-          cy="1766.5109046043215"
+          cy={yCenter - 433.48909539567853}
           r="1089.9141231431786"
           strokeWidth="3"
         />

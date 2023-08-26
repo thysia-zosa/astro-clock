@@ -1,4 +1,4 @@
-import { kWidth, xCenter, yCenter } from "../../../utils/constants";
+import { kRadius, kWidth, xCenter, yCenter } from "../../../utils/constants";
 import { stereoProject, toRad } from "../../../utils/math";
 
 const TemporalHours = () => {
@@ -8,7 +8,7 @@ const TemporalHours = () => {
   //   (46.836769 * t - 0.0001831 * t * t + 0.0020034 * t * t * t) / 3600;
   const eclipticAngle = 23.436206;
   const eclipticRadAngle = toRad(eclipticAngle);
-  const equatorRadius = 1000;
+  const equatorRadius = kRadius;
   const tropicalFactor =
     Math.cos(eclipticRadAngle) / (1 - Math.sin(eclipticRadAngle));
   const innerTropic = equatorRadius / tropicalFactor;
@@ -53,12 +53,14 @@ const TemporalHours = () => {
       xCenter + outerTropic * Math.sin(i * (temporalHourAngle + hour));
     const startY =
       yCenter + outerTropic * Math.cos(i * (temporalHourAngle + hour));
-    const endX = xCenter - innerTropic * Math.sin(i * (temporalHourAngle - hour));
-    const endY = yCenter + innerTropic * Math.cos(i * (temporalHourAngle - hour));
+    const endX =
+      xCenter - innerTropic * Math.sin(i * (temporalHourAngle - hour));
+    const endY =
+      yCenter + innerTropic * Math.cos(i * (temporalHourAngle - hour));
     const radiusCenterDistance =
       (outerTropic - innerTropic) / Math.sin(i * temporalHourAngle) / 2;
     const radius = Math.sqrt(
-      1000000 + radiusCenterDistance * radiusCenterDistance
+      kRadius * kRadius + radiusCenterDistance * radiusCenterDistance
     );
     return {
       startX: startX,
