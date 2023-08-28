@@ -5,7 +5,10 @@ import Tympanon from "./Tympanon/Tympanon";
 
 const Astrolabe = () => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 ${kWidth} ${kHeight}`}>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox={`0 0 ${kWidth} ${kHeight}`}
+    >
       <g stroke="#61DAFB" strokeWidth="1" fillOpacity="0">
         <Mater />
         <Tympanon />

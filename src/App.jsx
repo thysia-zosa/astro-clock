@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import "./App.css";
 import Astrolabe from "./components/Astrolabe/Astrolabe";
-import Menu from "./components/Astrolabe/Menu/Menu";
+import Menu from "./components/Menu/Menu";
 
 function App() {
   // let time = new Date().getTime() - 946728000000;

@@ -1,4 +1,4 @@
-import { xCenter, yCenter } from "../../../utils/constants";
+import { kBorder, xCenter, yCenter } from "../../../utils/constants";
 
 const Mater = () => {
   return (
@@ -11,17 +11,13 @@ const Mater = () => {
         cy={yCenter}
         r="1523.403218538857"
       />
-      <circle
-        id="border"
-        cx={xCenter}
-        cy={yCenter}
-        r="1732.0508075688767"
-      />
+      <circle id="border" cx={xCenter} cy={yCenter} r={kBorder} />
+      <circle id="limbus" cx={xCenter} cy={yCenter} r="1780" />
       <line
         x1={xCenter}
-        y1="467.94919243112327"
+        y1={yCenter - kBorder}
         x2={xCenter}
-        y2="3932.0508075688767"
+        y2={yCenter + kBorder}
       />
     </g>
   );
