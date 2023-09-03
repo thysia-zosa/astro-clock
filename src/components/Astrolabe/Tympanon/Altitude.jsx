@@ -1,9 +1,15 @@
 import { kBorder, kRadius, xCenter, yCenter } from "../../../utils/constants";
-import { stereoProject, toGrad, toRad } from "../../../utils/math";
+import {
+  getStereoCircle,
+  getXOfHorizontalIntersection,
+  getYOfHorizontalIntersection,
+  toGrad,
+} from "../../../utils/math";
 
 const Altitude = () => {
   let latitude = 47.4756694444444445;
 
+  // latitude of border (27.56...)
   const borderAngle = toGrad(2 * Math.atan(kBorder / kRadius)) - 90;
 
   function getAllCircles() {
@@ -15,11 +21,9 @@ const Altitude = () => {
   }
 
   function getAltitudeCircle(i) {
-    const netherLine = kRadius * stereoProject(toRad(latitude - i));
-    const upperLine = kRadius * stereoProject(toRad(latitude + i));
-    const radius = (netherLine - upperLine) / 2;
-    const center = yCenter - radius - upperLine;
+    const { radius, center } = getStereoCircle(latitude, i);
     if (i - latitude > borderAngle) {
+      // altitude circle overflows border limit, no complete circle
       return getIncompleteCircle(i, center, radius);
     }
     return (
@@ -50,15 +54,17 @@ const Altitude = () => {
    * distance = 2*x1 - 3200
    */
   function getIncompleteCircle(i, center, radius) {
-    const yLine =
-      (kBorder * kBorder -
-        radius * radius -
-        yCenter * yCenter +
-        center * center) /
-      (2 * (center - yCenter));
+    // yCoordinate of starting and ending point of the incomplete circle
+    // calculated as intersection of border circle and altitude circle
+    // r1: kBorder, r2: radius, y1; yCenter, y2: center
+    const yLine = getYOfHorizontalIntersection(
+      kBorder,
+      yCenter,
+      radius,
+      center
+    );
     const startingX =
-      xCenter +
-      Math.sqrt(kBorder * kBorder - (yCenter - yLine) * (yCenter - yLine));
+      xCenter + getXOfHorizontalIntersection(kBorder, yCenter, yLine);
     const distance = 2 * (startingX - xCenter);
     return (
       <path
