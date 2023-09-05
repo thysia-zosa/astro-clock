@@ -6,6 +6,7 @@ import {
   yCenter,
 } from "../../../utils/constants";
 import {
+  getCirclesIntersection,
   getStereoCircle,
   getYOfHorizontalIntersection,
   stereoProject,
@@ -15,15 +16,11 @@ import {
 const Azimuth = () => {
   let latitude = 47.4756694444444445;
 
-  // data of horizon line crossing the north-south-line
-  // const netherLine = kRadius * stereoProject(toRad(latitude - 90));
-  // const upperLine = kRadius * stereoProject(toRad(latitude + 90));
-  // const radius = (netherLine - upperLine) / 2;
-  // const center = yCenter - radius - upperLine;
+  // center and radius of horizon circle
   const { center: horizontalCenter, radius: horizontalRadius } =
     getStereoCircle(latitude, 90);
 
-  // y of where the horizon crosses the outerTropic
+  // y of where the horizon crosses the border
   const eqHorizon = getYOfHorizontalIntersection(
     kBorder,
     yCenter,
@@ -37,9 +34,6 @@ const Azimuth = () => {
   const interval = toRad(5);
   const zenith = yCenter - kRadius * stereoProject(toRad(latitude));
 
-  // ???
-  const cosHorizontal = Math.cos(toRad(90 - latitude));
-
   function getAllLines() {
     const azimuthLines = [];
     for (let i = 1; i < 36; i++) {
@@ -49,17 +43,25 @@ const Azimuth = () => {
   }
 
   /**
+   * Returns the horizontal part of a azimuthal circle
+   *
    * directional Lines:
    * arctan(cos(neigung)*tan(10°)) +abrunden((10°+90°)/180°)*180°
    * <circle cx="1600" cy="682.8873121387942" r="1356.8698103488061"></circle>
    */
   function getAzimuthLine(i) {
-    const firstPoint = getAzimuthPoint(i);
+    // calculate the two intersections of azimuthal circle with horizontal circle
+    let firstPoint = getAzimuthPoint(i);
     let secondPoint = getAzimuthPoint(36 - i, false);
-    const {x,y,radius} = getAzimuthRadius(firstPoint, secondPoint, i);
+    // calculate azimuth circle data
+    const { x, y, radius } = getAzimuthRadius(firstPoint, secondPoint, i);
 
-    if (secondPoint.angle > upperRange){
-      secondPoint = getBorderPoint(secondPoint,x,y,radius);
+    // correct points if outside border
+    if (firstPoint.angle > upperRange) {
+      firstPoint = getBorderPoint(firstPoint, x, y, radius);
+    }
+    if (secondPoint.angle > upperRange) {
+      secondPoint = getBorderPoint(secondPoint, x, y, radius);
     }
 
     const xDistance = secondPoint.x - firstPoint.x;
@@ -72,29 +74,73 @@ const Azimuth = () => {
     );
   }
 
+  // ???
+  const cosHorizontal = Math.cos(toRad(90 - latitude));
+
+  /**
+   * Transforms the horizontal angle of a horizontal point to
+   * an equatorial angle
+   *
+   * horizontal point: Point on the horizon / horizontal circle
+   * horizontal angle: Angle of horizontal point as seen from
+   * horizontal center
+   * equatorial angle: Angle of horizontal point as seen from
+   * equatorial center / north pole
+   *
+   * cos(alpha) = tan(b) / tan(c)
+   * alpha is the horizon's inclination towards the equator,
+   * b is the (searched for) equatorial angle from
+   * c, the horizontal angle
+   * @param {*} angle
+   * @param {*} addPi
+   * @returns
+   */
+  function getAzimuthalAngleCorrection(angle, addPi) {
+    let result = Math.atan(cosHorizontal * Math.tan(angle));
+    if (addPi) {
+      result += Math.PI;
+    }
+    return result;
+  }
+
+  /**
+   *
+   * @param {double} i count of intervals
+   * @param {boolean} right on the right side of astrolabe (x>xCenter)
+   * @returns
+   */
   function getAzimuthPoint(i, right = true) {
-    const angleCorrection =
-      Math.atan(cosHorizontal * Math.tan(i * interval)) +
-      Math.floor((i + 17) / 36) * Math.PI;
-    let x;
-    let y;
-    // if (angleCorrection > upperRange) {
-    //   x = xCenter + Math.sin(angleCorrection) * kBorder;
-    //   y = yCenter + Math.cos(angleCorrection) * kBorder;
-    // } else {
-      const gamma = Math.asin(
-        ((yCenter /* oder ?*/ - horizontalCenter) *
-          Math.sin(Math.PI - angleCorrection)) /
-          horizontalRadius
-      );
-      const beta = angleCorrection - gamma;
-      x = xCenter + Math.sin(beta) * horizontalRadius;
-      y = horizontalCenter + Math.cos(beta) * horizontalRadius;
+    let angleCorrection = getAzimuthalAngleCorrection(
+      i * interval,
+      Math.floor((i + 17) / 36)
+    );
+    /**
+     * sin(180°-alpha)/c = sin(gamma)/b
+     * alpha: angleCorrection
+     * gamma: angle between north Pole and horizontal center seen from azimuthal Point
+     * b: distance between north Pole and horizontal center
+     * c: horizontal Radius
+     */
+    const gamma = Math.asin(
+      ((yCenter - horizontalCenter) * Math.sin(Math.PI - angleCorrection)) /
+        horizontalRadius
+    );
+
+    // projected horizontal angle
+    const beta = angleCorrection - gamma;
+    const x = xCenter + Math.sin(beta) * horizontalRadius;
+    const y = horizontalCenter + Math.cos(beta) * horizontalRadius;
     // }
     return { x: right ? x : kWidth - x, y: y, angle: angleCorrection };
   }
 
   /**
+   * Calculates the center coordinates of the azimuthal circle
+   *
+   * The center is at the intersection of the median lines between
+   * each Point and the zenith, as the azimuthal circle touches
+   * all these three points
+   *
    * y = ax+b
    * y = cx+d
    * ax+b = cx+d
@@ -120,12 +166,12 @@ const Azimuth = () => {
     const radius = Math.sqrt(
       Math.pow(y - zenith, 2) + Math.pow(x - xCenter, 2)
     );
-    return {x,y,radius};
+    return { x, y, radius };
   }
 
   /**
    * Calculates the intersection of border circle and azimuthal circle.
-   * 
+   *
    * used when the second point of an azimuthal line lies outside the border cirlce
    * @param {{float,float,float}} uncorrected : Azimuthal Point with x,y,angleCorrection
    * @param {*} x center-x of azimuthal Circle
@@ -133,8 +179,20 @@ const Azimuth = () => {
    * @param {*} radius of azimuthal Circle
    * @returns Azimuthal Point of azimuthal Circle on Border
    */
-  function getBorderPoint(uncorrected, x,y,radius){
-    return {...uncorrected}
+  function getBorderPoint(uncorrected, x, y, radius) {
+    const intersections = getCirclesIntersection(
+      x,
+      y,
+      radius,
+      xCenter,
+      yCenter,
+      kBorder
+    );
+    const lowerIS =
+      intersections.results[0].y < intersections.results[1].y
+        ? intersections.results[0]
+        : intersections.results[1];
+    return { ...uncorrected, x: lowerIS.x, y: lowerIS.y };
   }
 
   return <g id="azimuth">{getAllLines()}</g>;

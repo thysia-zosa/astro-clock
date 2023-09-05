@@ -1,26 +1,56 @@
 import { kRadius, yCenter } from "./constants";
 
+// grad to radians
 export function toRad(grad) {
   return (Math.PI * grad) / 180;
 }
 
+// radians to grad
 export function toGrad(rad) {
   return (180 * rad) / Math.PI;
 }
 
+/**
+ * Calculates the projected distance of a latitude from north pole
+ *
+ * @param {double} radAngle northward latitude in radians
+ * @returns {double} distance from projected center
+ */
 export function stereoProject(radAngle) {
   return Math.tan(Math.PI / 4 - radAngle / 2);
 }
 
+/**
+ * Calculates the y coordinate of an intersection of two circles with same center-y-coordinate
+ * @param {double} r1 radius of first circle
+ * @param {double} y1 y-coordinate of first circle's center
+ * @param {double} r2 radius of second circle
+ * @param {double} y2 y-coordinate of second circle's center
+ * @returns
+ */
 export function getYOfHorizontalIntersection(r1, y1, r2, y2) {
   return (r1 * r1 + y2 * y2 - r2 * r2 - y1 * y1) / (2 * (y2 - y1));
 }
 
+/**
+ * Calculates the distance in horizontal distance from the centers x-ax of an intersection of two circles with the same senter-y-coordinate
+ * @param {double} radius radius of one circle
+ * @param {double} y1 y-coordinate of this circle's center
+ * @param {double} y2 y-coordinate of the two circles' intersection
+ * @returns
+ */
 export function getXOfHorizontalIntersection(radius, y1, y2) {
   const yDifference = y1 - y2;
   return Math.sqrt(radius * radius - yDifference * yDifference);
 }
 
+/**
+ * Calclulates center and radius of a projected circle around a non-center-spheric circle
+ *
+ * @param {double} latitude northward latitude of circle's center in radians
+ * @param {double} distAngle distance from circle's center in radius
+ * @returns
+ */
 export function getStereoCircle(latitude, distAngle) {
   // distance between southernmost point of altitude circle and north pole
   const netherLine = kRadius * stereoProject(toRad(latitude - distAngle));
@@ -40,6 +70,11 @@ export function getStereoCircle(latitude, distAngle) {
 }
 
 /**
+ * Calculates intersection of two circles
+ *
+ * Needs Radius and center coordinates from both circles
+ *
+ *
  * (x-a)² + (y-b)² - c² = (x-d)² + (y-e)² - f²
  * x²+a²-2xa + y²+b²-2yb - c² = x²+d²-2xd + y²+e²-2ye -f²
  * a²-2xa+b²-2yb-c² = d²-2xd+e²-2ye-f²
@@ -58,9 +93,17 @@ export function getStereoCircle(latitude, distAngle) {
  * @param {*} x2
  * @param {*} y2
  * @param {*} r2
- * @returns Array with the two points of intersection {x,y}
+ * @returns {
+ *    count: count of results (0,1,2; -1 means infinite)
+ *    results?: Array with the two points of intersection {x,y}
+ * }
  */
 export function getCirclesIntersection(x1, y1, r1, x2, y2, r2) {
+  let count;
+  if (x1 === x2 && y1 === y2 && r1 === r2) {
+    count = -1;
+    return { count };
+  }
   const factor = (x2 - x1) / (y1 - y2);
   const coefficient =
     (x1 * x1 - x2 * x2 + y1 * y1 - y2 * y2 + r2 * r2 - r1 * r1) /
@@ -68,14 +111,30 @@ export function getCirclesIntersection(x1, y1, r1, x2, y2, r2) {
   const a = 1 + factor * factor;
   const b = 2 * (coefficient * factor - x1 - y1 * factor);
   const c =
-    x1 * x1 + coefficient * coefficient + y1 * y1 - 2 * y1 * coefficient - r1 * r1;
+    x1 * x1 +
+    coefficient * coefficient +
+    y1 * y1 -
+    2 * y1 * coefficient -
+    r1 * r1;
   const root = Math.sqrt(b * b - 4 * a * c);
   const resultX1 = (-b + root) / (2 * a);
+  if (isNaN(resultX1)) {
+    count = 0;
+    return { count };
+  }
   const resultX2 = (-b - root) / (2 * a);
   const resultY1 = coefficient + resultX1 * factor;
+  if (resultX1 === resultX2) {
+    count = 1;
+    return { count, results: [{ x: resultX1, y: resultY1 }] };
+  }
   const resultY2 = coefficient + resultX2 * factor;
-  return [
-    { resultX1, resultY1 },
-    { resultX2, resultY2 },
-  ];
+  count = 2;
+  return {
+    count,
+    results: [
+      { x: resultX1, y: resultY1 },
+      { x: resultX2, y: resultY2 },
+    ],
+  };
 }
