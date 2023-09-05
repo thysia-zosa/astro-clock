@@ -7,7 +7,7 @@ const Rete = () => {
   /**
    * sidereal Time (in degrees) at J2000.0
    */
-  const siderealEpoch = 10.46061837500001;
+  const siderealEpoch = 280.46061837500001;
 
   /**
    * J2000.0 epoch in Unix-miliseconds
@@ -46,8 +46,8 @@ const Rete = () => {
       <g id="eclipticCircle">
         <circle
           id="ecliptic"
-          cx={xCenter}
-          cy={yCenter - 433.48909539567853}
+          cx={xCenter + 433.48909539567853}
+          cy={yCenter}
           r="1089.9141231431786"
           strokeWidth="3"
         />
