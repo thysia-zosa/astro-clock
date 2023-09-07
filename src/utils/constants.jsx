@@ -6,7 +6,7 @@ export const xCenter = 1800;
 export const yCenter = 2200;
 export const kRadius = 1000;
 export const kBorder = 1650;
-export const eclipticAngle = 23.436206;
-export const eclipticRadAngle = toRad(eclipticAngle);
-export const tropicalFactor =
-  Math.cos(eclipticRadAngle) / (1 - Math.sin(eclipticRadAngle));
+export const kEeclipticAngle = 23.436206;
+export const kEclipticRadAngle = toRad(kEeclipticAngle);
+export const kTropicalFactor =
+  Math.cos(kEclipticRadAngle) / (1 - Math.sin(kEclipticRadAngle));

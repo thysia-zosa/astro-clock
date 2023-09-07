@@ -74,7 +74,7 @@ const Azimuth = () => {
     );
   }
 
-  // ???
+  // inclination of horizon towards equator
   const cosHorizontal = Math.cos(toRad(90 - latitude));
 
   /**
@@ -91,8 +91,8 @@ const Azimuth = () => {
    * alpha is the horizon's inclination towards the equator,
    * b is the (searched for) equatorial angle from
    * c, the horizontal angle
-   * @param {*} angle
-   * @param {*} addPi
+   * @param {number} angle
+   * @param {boolean} addPi
    * @returns
    */
   function getAzimuthalAngleCorrection(angle, addPi) {

@@ -1,51 +1,56 @@
-import { kRadius, kWidth, xCenter, yCenter } from "../../../utils/constants";
-import { stereoProject, toRad } from "../../../utils/math";
+import {
+  kRadius,
+  kTropicalFactor,
+  kWidth,
+  xCenter,
+  yCenter,
+} from "../../../utils/constants";
+import {
+  getStereoCircle,
+  getYOfHorizontalIntersection,
+} from "../../../utils/math";
 
 const TemporalHours = () => {
   let latitude = 47.4756694444444445;
-  // const eclipticAngle =
-  //   42190703 / 1800000 -
-  //   (46.836769 * t - 0.0001831 * t * t + 0.0020034 * t * t * t) / 3600;
-  const eclipticAngle = 23.436206;
-  const eclipticRadAngle = toRad(eclipticAngle);
-  const equatorRadius = kRadius;
-  const tropicalFactor =
-    Math.cos(eclipticRadAngle) / (1 - Math.sin(eclipticRadAngle));
-  const innerTropic = equatorRadius / tropicalFactor;
-  const outerTropic = equatorRadius * tropicalFactor;
 
-  const netherLine = equatorRadius * stereoProject(toRad(latitude - 90));
-  const upperLine = equatorRadius * stereoProject(toRad(latitude + 90));
-  const radius = (netherLine - upperLine) / 2;
-  const center = yCenter - radius - upperLine;
-  const eqHorizon =
-    (outerTropic * outerTropic -
-      radius * radius -
-      yCenter * yCenter +
-      center * center) /
-    (2 * (center - yCenter));
+  const innerTropic = kRadius / kTropicalFactor;
+  const outerTropic = kRadius * kTropicalFactor;
+
+  const { center: horizontalCenter, radius: horizontalRadius } =
+    getStereoCircle(latitude, 90);
+
+  const eqHorizon = getYOfHorizontalIntersection(
+    outerTropic,
+    yCenter,
+    horizontalRadius,
+    horizontalCenter
+  );
+
   const temporalHourAngle = Math.asin((yCenter - eqHorizon) / outerTropic) / 6;
-
-  const temporalHourLines = [];
   const hour = Math.PI / 12;
-  for (let i = 1; i <= 5; i++) {
-    const nightHourData = nightHours(i);
-    temporalHourLines.push(
-      ...[
-        <path
-          key={`n${6 - i}`}
-          d={`M ${nightHourData.startX},${nightHourData.startY} a ${nightHourData.radius},${nightHourData.radius},0 0 1 ${nightHourData.xDistance},${nightHourData.yDistance}`}
-        />,
-        <path
-          key={`n${6 + i}`}
-          d={`M ${kWidth - nightHourData.startX},${nightHourData.startY} a ${
-            nightHourData.radius
-          },${nightHourData.radius},0 0 0 ${0 - nightHourData.xDistance},${
-            nightHourData.yDistance
-          }`}
-        />,
-      ]
-    );
+
+  function getAllHourLines() {
+    const temporalHourLines = [];
+    for (let i = 1; i <= 5; i++) {
+      const nightHourData = nightHours(i);
+      temporalHourLines.push(
+        ...[
+          <path
+            key={`n${6 - i}`}
+            d={`M ${nightHourData.startX},${nightHourData.startY} a ${nightHourData.radius},${nightHourData.radius},0 0 1 ${nightHourData.xDistance},${nightHourData.yDistance}`}
+          />,
+          <path
+            key={`n${6 + i}`}
+            d={`M ${kWidth - nightHourData.startX},${nightHourData.startY} a ${
+              nightHourData.radius
+            },${nightHourData.radius},0 0 0 ${0 - nightHourData.xDistance},${
+              nightHourData.yDistance
+            }`}
+          />,
+        ]
+      );
+    }
+    return temporalHourLines;
   }
 
   function nightHours(i) {
@@ -73,7 +78,7 @@ const TemporalHours = () => {
     };
   }
 
-  return <g id="temporalHours">{temporalHourLines}</g>;
+  return <g id="temporalHours">{getAllHourLines()}</g>;
 };
 
 export default TemporalHours;
