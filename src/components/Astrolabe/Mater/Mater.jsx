@@ -1,18 +1,30 @@
-import { kBorder, xCenter, yCenter } from "../../../utils/constants";
+import {
+  kBorder,
+  kLimbus,
+  kRadius,
+  kTropicalFactor,
+  xCenter,
+  yCenter,
+} from "../../../utils/constants";
 
 const Mater = () => {
   return (
     <g id="mater" strokeWidth="3">
-      <circle id="equator" cx={xCenter} cy={yCenter} r="1000" />
-      <circle id="innerTropic" cx={xCenter} cy={yCenter} r="656.4250277475" />
+      <circle id="equator" cx={xCenter} cy={yCenter} r={kRadius} />
+      <circle
+        id="innerTropic"
+        cx={xCenter}
+        cy={yCenter}
+        r={kRadius * kTropicalFactor}
+      />
       <circle
         id="outerTropic"
         cx={xCenter}
         cy={yCenter}
-        r="1523.403218538857"
+        r={kRadius / kTropicalFactor}
       />
       <circle id="border" cx={xCenter} cy={yCenter} r={kBorder} />
-      <circle id="limbus" cx={xCenter} cy={yCenter} r="1780" />
+      <circle id="limbus" cx={xCenter} cy={yCenter} r={kLimbus} />
       <line
         x1={xCenter}
         y1={yCenter - kBorder}
