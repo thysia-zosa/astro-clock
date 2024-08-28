@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { xCenter, yCenter } from "../../../utils/constants";
+import constellations from "../../../data/constellations";
+import Constellation from "./Constellation";
 
 const Rete = () => {
   let longitude = 8.222566666666667;
-  
+
   /**
    * sidereal Time (in degrees) at J2000.0
    */
@@ -12,7 +14,7 @@ const Rete = () => {
   /**
    * J2000.0 epoch in Unix-miliseconds
    */
-  const unixJ2000 = 946728000000
+  const unixJ2000 = 946728000000;
 
   /**
    * Miliseconds for a sidereal movement of 1 degree.
@@ -21,10 +23,10 @@ const Rete = () => {
 
   /**
    * Simplified calculation of sidereal time in degrees
-   * 
-   * Calculates the degrees passed since J2000.0 according to the 
+   *
+   * Calculates the degrees passed since J2000.0 according to the
    * middle apparent movement of the sky
-   * 
+   *
    * @returns the current sidereal time of [longitude] in degrees
    */
   function getSiderealTime() {
@@ -51,6 +53,16 @@ const Rete = () => {
           r="1089.9141231431786"
           strokeWidth="3"
         />
+      </g>
+      <g id="constellations">
+        {constellations.map(({ name, stars, asterism }) => (
+          <Constellation
+            key={name}
+            name={name}
+            stars={stars}
+            asterism={asterism}
+          />
+        ))}
       </g>
     </g>
   );
