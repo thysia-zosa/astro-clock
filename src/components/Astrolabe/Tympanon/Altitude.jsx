@@ -7,9 +7,10 @@ import {
 } from "../../../utils/math";
 
 const Altitude = () => {
+  // TODO: Move to store
   let latitude = 47.4756694444444445;
 
-  // latitude of border (27.56...)
+  // hypothetical latitude of border circle (27.56...° south / north)
   const borderAngle = toGrad(2 * Math.atan(kBorder / kRadius)) - 90;
 
   function getAllCircles() {
