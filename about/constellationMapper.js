@@ -193,7 +193,7 @@ const calcStar = (starRow) => {
   }
   const distance = 1000 * stereoProject(toRad(dec));
   const raRad = toRad(ra);
-  const x = 1800 + Math.round(Math.sin(raRad) * distance);
+  const x = 1800 - Math.round(Math.sin(raRad) * distance);
   const y = 2200 - Math.round(Math.cos(raRad) * distance);
   const rad = Math.ceil(5 - mag);
 
