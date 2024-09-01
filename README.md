@@ -1,5 +1,19 @@
 # Astro-Clock
 
+## Quick Start
+
+Requirements: node.js
+
+```bash
+# install dependencies
+npm install
+
+# start app
+npm start
+
+# to quit, use ctrl-c
+```
+
 ## Uit Wikipedia
 
 Een astrolabium is een instrument waarmee hoeken gemeten kunnen worden, voor
