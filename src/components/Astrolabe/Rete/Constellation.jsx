@@ -9,7 +9,7 @@ const Constellation = ({ name, stars, asterism }) => {
           <Star
             key={index}
             starid={star.id}
-            radius={star.mag}
+            radius={star.rad}
             x={star.x}
             y={star.y}
             name={star.name}
