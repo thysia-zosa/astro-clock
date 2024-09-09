@@ -11,7 +11,7 @@ import {
 } from "../../../utils/math";
 
 const TemporalHours = () => {
-  let latitude = 47.4756694444444445;
+  let latitude = 47.252222222222;
 
   const innerTropic = kRadius / kTropicalFactor;
   const outerTropic = kRadius * kTropicalFactor;

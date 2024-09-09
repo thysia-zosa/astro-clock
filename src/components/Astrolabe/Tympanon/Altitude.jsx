@@ -8,7 +8,7 @@ import {
 
 const Altitude = () => {
   // TODO: Move to store
-  let latitude = 47.4756694444444445;
+  let latitude = 47.252222222222;
 
   // hypothetical latitude of border circle (27°33'47.5" south / north)
   const borderAngle = toGrad(2 * Math.atan(kBorder / kRadius)) - 90;

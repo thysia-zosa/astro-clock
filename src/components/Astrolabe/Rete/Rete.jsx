@@ -4,7 +4,7 @@ import constellations from "../../../data/constellations";
 import Constellation from "./Constellation";
 
 const Rete = () => {
-  let longitude = 8.222566666666667;
+  let longitude = 7.849444444444444;
 
   /**
    * sidereal Time (in degrees) at J2000.0

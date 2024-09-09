@@ -14,7 +14,7 @@ import {
 } from "../../../utils/math";
 
 const Azimuth = () => {
-  let latitude = 47.4756694444444445;
+  let latitude = 47.252222222222;
 
   // center and radius of horizon circle
   const { center: horizontalCenter, radius: horizontalRadius } =
