@@ -1,4 +1,5 @@
 import {
+  kEclipticRadAngle,
   kRadius,
   siderealDegree,
   siderealEpoch,
@@ -158,3 +159,56 @@ export function getSiderealTime(longitude) {
   return (longitude + siderealEpoch + time / siderealDegree) % 360;
 }
 
+function getExcentricAnomaly(meanAnomaly, excentricity) {
+  let excentricAnomaly = meanAnomaly;
+  for (let i = 0; i < 10; i++) {
+    excentricAnomaly = meanAnomaly + excentricity * Math.sin(excentricAnomaly);
+  }
+  return excentricAnomaly;
+}
+
+function getTrueAnomaly(excentricAnomaly, excentricity) {
+  // REST(ARCTAN(WURZEL((1+AD2)/(1-AD2))*TAN(AL2/2));PI())*2
+  return (
+    ((Math.atan(
+      Math.sqrt((1 + excentricity) / (1 - excentricity)) *
+        Math.tan(excentricAnomaly / 2)
+    ) +
+      Math.PI) %
+      Math.PI) *
+    2
+  );
+}
+
+// Calculate the location of the Sun
+export function getSunLocation() {
+  // // variables
+  const t = (new Date().getTime + 2208945600000) / 3155760000000;
+  const excentricity = 0.01675104 - 0.0000418 * t - 0.000000126 * t * t;
+  const eclipticLongitudeAtEpoch =
+    279.6966778 + 36000.76892 * t + 0.0003025 * t * t;
+  const eclipticLongitudeAtPerigee =
+    281.2208444 + 1.719175 * t + 0.000452778 * t * t;
+  // // Take a snapshot of the ecliptic coordinates for the object of interest at some convenient instant of time
+  // // Calculate how many days (D), including fractional parts of a day, have elapsed since the snapshot was taken.
+  // // Calculate how far the object has moved along in its orbit in D days.
+  // // If necessary, apply corrections, such as precession, to account for irregularities in the object's orbit.
+  // // Convert the corrected ecliptic coordinates to horizon coordinates.
+
+  const d = ((new Date().getTime() - unixJ2000) % 31556925252) + 1;
+  const meanAnomaly =
+    (2 * Math.PI * d + eclipticLongitudeAtEpoch - eclipticLongitudeAtPerigee) %
+    (2 * Math.PI);
+  const excentricAnomaly = getExcentricAnomaly(meanAnomaly, excentricity);
+  const trueAnomaly = getTrueAnomaly(excentricAnomaly, excentricity);
+  const ecclipticLongitude =
+    (trueAnomaly + eclipticLongitudeAtPerigee) % (2 * Math.PI);
+  // ARCTAN((SIN(AN2)*COS(AG2))/COS(AN2))
+  const rightAscension = Math.atan(
+    Math.cos(kEclipticRadAngle) * Math.tan(ecclipticLongitude)
+  );
+  const declination = Math.asin(
+    Math.sin(kEclipticRadAngle) * Math.sin(ecclipticLongitude)
+  );
+  return [rightAscension, declination];
+}
