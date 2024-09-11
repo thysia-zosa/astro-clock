@@ -1,4 +1,10 @@
-import { kRadius, yCenter } from "./constants";
+import {
+  kRadius,
+  siderealDegree,
+  siderealEpoch,
+  unixJ2000,
+  yCenter,
+} from "./constants";
 
 // grad to radians
 export function toRad(grad) {
@@ -138,3 +144,17 @@ export function getCirclesIntersection(x1, y1, r1, x2, y2, r2) {
     ],
   };
 }
+
+/**
+ * Simplified calculation of sidereal time in degrees
+ *
+ * Calculates the degrees passed since J2000.0 according to the
+ * middle apparent movement of the sky
+ *
+ * @returns the current sidereal time of [longitude] in degrees
+ */
+export function getSiderealTime(longitude) {
+  let time = new Date().getTime() - unixJ2000;
+  return (longitude + siderealEpoch + time / siderealDegree) % 360;
+}
+

@@ -57,3 +57,18 @@ export const kTropicalFactor =
   Math.cos(kEclipticRadAngle) / (1 - Math.sin(kEclipticRadAngle));
 
 // astronomical constants
+/**
+ * sidereal Time (in degrees) at J2000.0
+ */
+export const siderealEpoch = 280.46061837500001;
+
+/**
+ * J2000.0 epoch in Unix-miliseconds
+ */
+export const unixJ2000 = 946728000000;
+
+/**
+ * Miliseconds for a sidereal movement of 1 degree.
+ */
+export const siderealDegree = 239344.69591898023;
+
