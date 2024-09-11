@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { xCenter, yCenter } from "../../../utils/constants";
 import { getSiderealTime } from "../../../utils/math";
 import constellations from "../../../data/constellations";
-import Constellation from "./Constellation";
+import Constellation from "./FixedStars/Constellation";
+import Ecliptic from "./Ecliptic";
 
 const Rete = () => {
   let longitude = 7.849444444444444;
@@ -19,15 +20,7 @@ const Rete = () => {
 
   return (
     <g id="rete" transform={`rotate(${siderealTime},${xCenter},${yCenter})`}>
-      <g id="eclipticCircle">
-        <circle
-          id="ecliptic"
-          cx={xCenter + 433.48909539567853}
-          cy={yCenter}
-          r="1089.9141231431786"
-          strokeWidth="3"
-        />
-      </g>
+      <Ecliptic />
       <g id="constellations">
         {constellations.map(({ name, stars, asterism }) => (
           <Constellation

@@ -56,6 +56,10 @@ export const kEclipticRadAngle = toRad(kEeclipticAngle);
 export const kTropicalFactor =
   Math.cos(kEclipticRadAngle) / (1 - Math.sin(kEclipticRadAngle));
 
+export const kEclipticRadius = (kTropicalFactor + 1 / kTropicalFactor) * 500;
+
+export const kEclipticCenterX = xCenter + (kTropicalFactor - 1 / kTropicalFactor) * 500;
+
 // astronomical constants
 /**
  * sidereal Time (in degrees) at J2000.0
