@@ -1,11 +1,12 @@
-const Star = ({ starid, radius, x, y }) => {
+const Star = ({ starid, radius, x, y, name }) => {
   return (
     <circle
       className="star"
-      starid={starid}
+      id={starid}
       r={radius}
       cx={x}
       cy={y}
+      name={name}
       fill="white"
       stroke="white"
       fillOpacity="1"

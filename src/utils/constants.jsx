@@ -56,9 +56,9 @@ export const kEclipticRadAngle = toRad(kEeclipticAngle);
 export const kTropicalFactor =
   Math.cos(kEclipticRadAngle) / (1 - Math.sin(kEclipticRadAngle));
 
-export const kEclipticRadius = (kTropicalFactor + 1 / kTropicalFactor) * 500;
+export const kEclipticRadius = (kTropicalFactor + 1 / kTropicalFactor) * kRadius / 2;
 
-export const kEclipticCenterX = xCenter + (kTropicalFactor - 1 / kTropicalFactor) * 500;
+export const kEclipticCenterX = xCenter + (kTropicalFactor - 1 / kTropicalFactor) * kRadius / 2;
 
 // astronomical constants
 /**

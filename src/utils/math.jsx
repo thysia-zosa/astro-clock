@@ -4,6 +4,7 @@ import {
   siderealDegree,
   siderealEpoch,
   unixJ2000,
+  xCenter,
   yCenter,
 } from "./constants";
 
@@ -183,7 +184,7 @@ function getTrueAnomaly(excentricAnomaly, excentricity) {
 // Calculate the location of the Sun
 export function getSunLocation() {
   // // variables
-  const t = (new Date().getTime + 2208945600000) / 3155760000000;
+  const t = (new Date().getTime() + 2208945600000) / 3155760000000;
   const excentricity = 0.01675104 - 0.0000418 * t - 0.000000126 * t * t;
   const eclipticLongitudeAtEpoch =
     279.6966778 + 36000.76892 * t + 0.0003025 * t * t;
@@ -210,5 +211,14 @@ export function getSunLocation() {
   const declination = Math.asin(
     Math.sin(kEclipticRadAngle) * Math.sin(ecclipticLongitude)
   );
-  return [rightAscension, declination];
+  // return {rightAscension, declination};
+  console.log(t, excentricity, eclipticLongitudeAtEpoch, eclipticLongitudeAtPerigee, d, meanAnomaly, excentricAnomaly, trueAnomaly, ecclipticLongitude, rightAscension, declination);
+  return convertCoordsToPosition({ rightAscension, declination });
+}
+
+function convertCoordsToPosition({ rightAscension, declination }) {
+  const distance = stereoProject(declination) * kRadius;
+  const x = xCenter - distance * Math.sin(rightAscension);
+  const y = yCenter - distance * Math.cos(rightAscension);
+  return { x, y };
 }
