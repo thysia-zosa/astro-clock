@@ -184,19 +184,22 @@ function getTrueAnomaly(excentricAnomaly, excentricity) {
 // Calculate the location of the Sun
 export function getSunLocation() {
   // // variables
-  const t = (new Date().getTime() + 2208945600000) / 3155760000000;
-  const excentricity = 0.01675104 - 0.0000418 * t - 0.000000126 * t * t;
-  const eclipticLongitudeAtEpoch =
-    279.6966778 + 36000.76892 * t + 0.0003025 * t * t;
-  const eclipticLongitudeAtPerigee =
-    281.2208444 + 1.719175 * t + 0.000452778 * t * t;
+  // const t = (new Date().getTime() + 2208945600000) / 3155760000000;
+  // const excentricity = 0.01675104 - 0.0000418 * t - 0.000000126 * t * t;
+  // const eclipticLongitudeAtEpoch =
+  //   toRad((279.6966778 + 36000.76892 * t + 0.0003025 * t * t) % 360);
+  // const eclipticLongitudeAtPerigee =
+  //   toRad((281.2208444 + 1.719175 * t + 0.000452778 * t * t) % 360);
+  const excentricity = 0.016708;
+  const eclipticLongitudeAtEpoch = toRad(280.466069);
+  const eclipticLongitudeAtPerigee = toRad(282.938346);
   // // Take a snapshot of the ecliptic coordinates for the object of interest at some convenient instant of time
   // // Calculate how many days (D), including fractional parts of a day, have elapsed since the snapshot was taken.
   // // Calculate how far the object has moved along in its orbit in D days.
   // // If necessary, apply corrections, such as precession, to account for irregularities in the object's orbit.
   // // Convert the corrected ecliptic coordinates to horizon coordinates.
 
-  const d = ((new Date().getTime() - unixJ2000) % 31556925252) + 1;
+  const d = ((new Date().getTime() - unixJ2000) / 31556925252) % 1;
   const meanAnomaly =
     (2 * Math.PI * d + eclipticLongitudeAtEpoch - eclipticLongitudeAtPerigee) %
     (2 * Math.PI);
@@ -205,14 +208,14 @@ export function getSunLocation() {
   const ecclipticLongitude =
     (trueAnomaly + eclipticLongitudeAtPerigee) % (2 * Math.PI);
   // ARCTAN((SIN(AN2)*COS(AG2))/COS(AN2))
-  const rightAscension = Math.atan(
+  let rightAscension = Math.atan(
     Math.cos(kEclipticRadAngle) * Math.tan(ecclipticLongitude)
   );
+  rightAscension += Math.round((ecclipticLongitude - rightAscension) / Math.PI) * Math.PI;
   const declination = Math.asin(
     Math.sin(kEclipticRadAngle) * Math.sin(ecclipticLongitude)
   );
   // return {rightAscension, declination};
-  console.log(t, excentricity, eclipticLongitudeAtEpoch, eclipticLongitudeAtPerigee, d, meanAnomaly, excentricAnomaly, trueAnomaly, ecclipticLongitude, rightAscension, declination);
   return convertCoordsToPosition({ rightAscension, declination });
 }
 
