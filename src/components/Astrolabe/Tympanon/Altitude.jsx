@@ -73,7 +73,7 @@ const Altitude = () => {
         d={`M ${startingX} , ${yLine} a ${radius},${radius} 0 ${
           yLine > center ? 0 : 1
         },1 -${distance} ,0`}
-        strokeWidth={i % 10 === 0 ? "2" : 1}
+        strokeWidth={i % 90 === 0 ? "3" : i % 10 === 0 ? "2" : "1"}
       />
     );
   }

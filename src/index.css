@@ -8,7 +8,7 @@ body {
 }
 
 #root {
-  background-color: #282c34;
+  background-color: black;
   width: 100vw;
   min-height: 100vh;
   height: 100%;

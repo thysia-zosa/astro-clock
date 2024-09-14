@@ -9,7 +9,7 @@ const Astrolabe = () => {
       xmlns="http://www.w3.org/2000/svg"
       viewBox={`0 0 ${kWidth} ${kHeight}`}
     >
-      <g stroke="#61DAFB" strokeWidth="1" fillOpacity="0">
+      <g stroke="#61DAFB" strokeWidth="1" fillOpacity="0" strokeOpacity="0.35">
         <Mater />
         <Tympanon />
         <Rete />

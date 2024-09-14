@@ -23,8 +23,8 @@ const Mater = () => {
         cy={yCenter}
         r={kRadius / kTropicalFactor}
       />
-      <circle id="border" cx={xCenter} cy={yCenter} r={kBorder} />
-      <circle id="limbus" cx={xCenter} cy={yCenter} r={kLimbus} />
+      <circle id="border" cx={xCenter} cy={yCenter} r={kBorder} strokeOpacity="1" />
+      <circle id="limbus" cx={xCenter} cy={yCenter} r={kLimbus} strokeOpacity="1" />
       <line
         x1={xCenter}
         y1={yCenter - kBorder}

@@ -70,6 +70,7 @@ const Azimuth = () => {
       <path
         key={`d${i * 5}`}
         d={`M ${firstPoint.x},${firstPoint.y} a ${radius},${radius},0 0 0 ${xDistance},${yDistance}`}
+        strokeWidth={i % 18 === 0 ? "3" : i % 3 === 0 ? "2" : "1"}
       />
     );
   }
