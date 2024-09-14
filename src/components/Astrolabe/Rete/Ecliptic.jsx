@@ -4,7 +4,12 @@ import {
   kEclipticRadius,
   yCenter,
 } from "../../../utils/constants";
-import { getSunLocation, getSunCoords, getPlanet } from "../../../utils/math";
+import {
+  getSunLocation,
+  getSunCoords,
+  getPlanet,
+  getMoonCoords,
+} from "../../../utils/math";
 import planets from "../../../data/planets";
 
 const Ecliptic = () => {
@@ -18,9 +23,10 @@ const Ecliptic = () => {
   //   return () => clearInterval(interval);
   // });
 
-  const sunLocation = getSunLocation();
-  const sunCoords = getSunCoords(sunLocation);
-  const planetPart = planets.map((p) => getPlanet(p, sunLocation));
+  const { meanAnomaly, ecclipticLongitude } = getSunLocation();
+  const sunCoords = getSunCoords(ecclipticLongitude);
+  const planetPart = planets.map((p) => getPlanet(p, ecclipticLongitude));
+  const moonCoords = getMoonCoords(meanAnomaly, ecclipticLongitude);
 
   return (
     <g id="eclipticCircle">
@@ -53,6 +59,16 @@ const Ecliptic = () => {
           fillOpacity="1"
         />
       ))}
+      <circle
+        id="moon"
+        cx={moonCoords.x}
+        cy={moonCoords.y}
+        r="20"
+        name="moon"
+        fill="lightgrey"
+        stroke="lightgrey"
+        fillOpacity="1"
+      />
     </g>
   );
 };

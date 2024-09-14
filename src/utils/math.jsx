@@ -194,7 +194,7 @@ export function getSunLocation() {
   const trueAnomaly = getTrueAnomaly(excentricAnomaly, excentricity);
   const ecclipticLongitude =
     (trueAnomaly + eclipticLongitudeAtPerigee) % (2 * Math.PI);
-  return ecclipticLongitude;
+  return { meanAnomaly, ecclipticLongitude };
 }
 
 export function getSunCoords(ecclipticLongitude) {
@@ -307,6 +307,73 @@ export function getPlanet(planet, ecclipticLongitude) {
     color: planet.color,
     ...positions,
   };
+}
+
+export function getMoonCoords(meanAnomalyOfSun, ecclLongOfSun) {
+  const daysSinceEpoch = (new Date().getTime() - unixJ2000) / 86400000;
+  const inclinationOfOrbit = toRad(5.1453964);
+  const ecclLongAtEpoch = toRad(218.316433);
+  const ecclLongAtPerigee = toRad(83.353451);
+  const meanEcclLongOfAscNodeAtEpoch = toRad(125.044522);
+  const meanEcclLong =
+    (toRad(13.176339686) * daysSinceEpoch + ecclLongAtEpoch) % (2 * Math.PI);
+  const meanEcclLongOfAscNode =
+    (10 * Math.PI +
+      meanEcclLongOfAscNodeAtEpoch -
+      toRad(0.0529539) * daysSinceEpoch) %
+    (2 * Math.PI);
+  const meanAnomalyOfMoon =
+    (10 * Math.PI +
+      meanEcclLong -
+      toRad(0.114041) * daysSinceEpoch -
+      ecclLongAtPerigee) %
+    (2 * Math.PI);
+  const equationCorrection = toRad(0.1858) * Math.sin(meanAnomalyOfSun);
+  const evecCorrection =
+    toRad(1.2739) *
+    Math.sin(2 * (meanEcclLong - ecclLongOfSun) - meanAnomalyOfMoon);
+  const meanAnomalyCorrection =
+    meanAnomalyOfMoon +
+    evecCorrection -
+    equationCorrection -
+    toRad(0.37) * Math.sin(meanAnomalyOfSun);
+  const trueAnomalyOfMoon =
+    toRad(6.2886) * Math.sin(meanAnomalyCorrection) +
+    toRad(0.214) * Math.sin(2 * meanAnomalyCorrection);
+  const corrEcclLong =
+    meanEcclLong + evecCorrection + trueAnomalyOfMoon - equationCorrection;
+  const variationCorrection =
+    toRad(0.6583) * Math.sin(2 * (corrEcclLong - ecclLongOfSun));
+  const trueEcclLong = corrEcclLong + variationCorrection;
+  const corrEcclLongOfAscNode =
+    meanEcclLongOfAscNode - toRad(0.16) * Math.sin(meanAnomalyOfSun);
+  const ecclipticLongitude =
+    (2 * Math.PI +
+      corrEcclLongOfAscNode +
+      Math.atan(
+        Math.sin(trueEcclLong - corrEcclLongOfAscNode) *
+          Math.cos(inclinationOfOrbit),
+        Math.cos(trueEcclLong - corrEcclLongOfAscNode)
+      )) %
+    (2 * Math.PI);
+  const ecclipticLatitude = Math.asin(
+    Math.sin(trueEcclLong - corrEcclLongOfAscNode) *
+      Math.sin(inclinationOfOrbit)
+  );
+  let rightAscension = Math.atan(
+    (Math.sin(ecclipticLongitude) * Math.cos(kEclipticRadAngle) -
+      Math.tan(ecclipticLatitude) * Math.sin(kEclipticRadAngle)) /
+      Math.cos(ecclipticLongitude)
+  );
+  rightAscension +=
+    Math.round((ecclipticLongitude - rightAscension) / Math.PI) * Math.PI;
+  const declination = Math.asin(
+    Math.sin(ecclipticLatitude) * Math.cos(kEclipticRadAngle) +
+      Math.cos(ecclipticLatitude) *
+        Math.sin(kEclipticRadAngle) *
+        Math.sin(ecclipticLongitude)
+  );
+  return convertCoordsToPosition({ rightAscension, declination });
 }
 
 function convertCoordsToPosition({ rightAscension, declination }) {
