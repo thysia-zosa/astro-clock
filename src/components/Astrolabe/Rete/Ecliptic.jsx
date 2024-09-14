@@ -35,7 +35,7 @@ const Ecliptic = () => {
         id="sun"
         cx={sunCoords.x}
         cy={sunCoords.y}
-        r="12"
+        r="20"
         name="sun"
         fill="yellow"
         stroke="yellow"

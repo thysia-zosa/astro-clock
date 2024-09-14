@@ -304,7 +304,7 @@ export function getPlanet(planet, ecclipticLongitude) {
   return {
     name: planet.name,
     rad: Math.ceil(5 - planet.VP),
-    color: "red",
+    color: planet.color,
     ...positions,
   };
 }

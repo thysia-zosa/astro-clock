@@ -20,7 +20,6 @@ const Rete = () => {
 
   return (
     <g id="rete" transform={`rotate(${siderealTime},${xCenter},${yCenter})`}>
-      <Ecliptic />
       <g id="constellations">
         {constellations.map(({ name, stars, asterism }) => (
           <Constellation
@@ -31,6 +30,7 @@ const Rete = () => {
           />
         ))}
       </g>
+      <Ecliptic />
     </g>
   );
 };
