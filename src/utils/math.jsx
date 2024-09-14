@@ -194,6 +194,10 @@ export function getSunLocation() {
   const trueAnomaly = getTrueAnomaly(excentricAnomaly, excentricity);
   const ecclipticLongitude =
     (trueAnomaly + eclipticLongitudeAtPerigee) % (2 * Math.PI);
+  return ecclipticLongitude;
+}
+
+export function getSunCoords(ecclipticLongitude) {
   let rightAscension = Math.atan(
     Math.cos(kEclipticRadAngle) * Math.tan(ecclipticLongitude)
   );
@@ -202,8 +206,107 @@ export function getSunLocation() {
   const declination = Math.asin(
     Math.sin(kEclipticRadAngle) * Math.sin(ecclipticLongitude)
   );
-  // return {rightAscension, declination};
   return convertCoordsToPosition({ rightAscension, declination });
+}
+
+function isInferior(aP) {
+  return aP < 1;
+}
+
+function getGeocentricEcclipticLongitude(aP, RP, LamdaP, L_P, LE, RE) {
+  if (isInferior(aP)) return getGelForInferiorPlanet(RP, LamdaP, L_P, LE, RE);
+  return getGelForSuperiorPlanet(RP, LamdaP, L_P, LE, RE);
+}
+
+function getGelForInferiorPlanet(RP, LamdaP, L_P, LE, RE) {
+  return (
+    (3 * Math.PI +
+      LE +
+      Math.atan(
+        (RP * Math.cos(LamdaP) * Math.sin(LE - L_P)) /
+          (RE - RP * Math.cos(LamdaP) * Math.cos(LE - L_P))
+      )) %
+    (2 * Math.PI)
+  );
+}
+
+function getGelForSuperiorPlanet(RP, LamdaP, L_P, LE, RE) {
+  return (
+    2 * Math.PI +
+    L_P +
+    (Math.atan(
+      (RE * Math.sin(L_P - LE)) /
+        (RP * Math.cos(LamdaP) - RE * Math.cos(LE - L_P))
+    ) %
+      (2 * Math.PI))
+  );
+}
+
+// Calculate the location of the Sun
+function getPlanetLocation(planet, earth) {
+  const { TP, eP, aP, iP, epsilonP, piP, OmegaP } = planet;
+  const {
+    /* earth's distance from sun in AU */ RE,
+    /* earth's heliocentric eccliptic longitude */ LE,
+  } = earth;
+
+  const /* number of days since the standard epoch */ DE =
+      ((new Date().getTime() - unixJ2000) / (31556925252 * TP)) % 2;
+  const /* mean anomaly */ Mp =
+      (2 * Math.PI * DE + epsilonP - piP) % (2 * Math.PI);
+  const /* excentric anomaly */ EP = getExcentricAnomaly(Mp, eP);
+  const /* true anomaly */ ypsilonP = getTrueAnomaly(EP, eP);
+  const /* heliocentric eccliptic longitude */ LP =
+      (ypsilonP + piP) % (2 * Math.PI);
+  const /* heliocentric eccliptic latitude */ LamdaP = Math.asin(
+      Math.sin(LP - OmegaP) * Math.sin(iP)
+    );
+  const /* distance from sun in AU */ RP =
+      (aP * (1 - eP * eP)) / (1 + eP * Math.cos(ypsilonP));
+  let /* adjustment to heliocentric eccliptic longitude */ L_P =
+      OmegaP +
+      Math.atan((Math.sin(LP - OmegaP) * Math.cos(iP)) / Math.cos(LP - OmegaP));
+  L_P += Math.round((LP - L_P) / Math.PI) * Math.PI;
+
+  const /* geocentric eccliptic longitude */ lambda_P =
+      getGeocentricEcclipticLongitude(aP, RP, LamdaP, L_P, LE, RE);
+  const /* geocentric eccliptic latitude */ betaP = Math.atan(
+      (RP * Math.cos(LamdaP) * Math.tan(LamdaP) * Math.sin(lambda_P - L_P)) /
+        (RE * Math.sin(L_P - LE))
+    );
+  let rightAscension = Math.atan(
+    (Math.sin(lambda_P) * Math.cos(kEclipticRadAngle) -
+      Math.tan(betaP) * Math.sin(kEclipticRadAngle)) /
+      Math.cos(lambda_P)
+  );
+  rightAscension += Math.round((lambda_P - rightAscension) / Math.PI) * Math.PI;
+  const declination = Math.asin(
+    Math.sin(betaP) * Math.cos(kEclipticRadAngle) +
+      Math.cos(betaP) * Math.sin(kEclipticRadAngle) * Math.sin(lambda_P)
+  );
+  return convertCoordsToPosition({ rightAscension, declination });
+}
+
+export function getPlanet(planet, ecclipticLongitude) {
+  const LE = ecclipticLongitude + (Math.PI % (2 * Math.PI));
+  const positions = getPlanetLocation(
+    {
+      TP: planet.TP,
+      eP: planet.eP,
+      aP: planet.aP,
+      iP: toRad(planet.iP),
+      epsilonP: toRad(planet.epsilonP),
+      piP: toRad(planet.piP),
+      OmegaP: toRad(planet.OmegaP),
+    },
+    { RE: 1, LE }
+  );
+  return {
+    name: planet.name,
+    rad: Math.ceil(5 - planet.VP),
+    color: "red",
+    ...positions,
+  };
 }
 
 function convertCoordsToPosition({ rightAscension, declination }) {

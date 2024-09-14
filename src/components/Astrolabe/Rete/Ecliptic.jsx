@@ -1,21 +1,26 @@
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 import {
   kEclipticCenterX,
   kEclipticRadius,
   yCenter,
 } from "../../../utils/constants";
-import { getSunLocation } from "../../../utils/math";
+import { getSunLocation, getSunCoords, getPlanet } from "../../../utils/math";
+import planets from "../../../data/planets";
 
 const Ecliptic = () => {
-  const [sunLocation, setSunLocation] = useState(getSunLocation());
+  // const [sunLocation, setSunLocation] = useState(getSunLocation());
 
-  useEffect(() => {
-    const interval = setInterval(
-      () => setSunLocation(getSunLocation()),
-      600000
-    );
-    return () => clearInterval(interval);
-  });
+  // useEffect(() => {
+  //   const interval = setInterval(
+  //     () => setSunLocation(getSunLocation()),
+  //     600000
+  //   );
+  //   return () => clearInterval(interval);
+  // });
+
+  const sunLocation = getSunLocation();
+  const sunCoords = getSunCoords(sunLocation);
+  const planetPart = planets.map((p) => getPlanet(p, sunLocation));
 
   return (
     <g id="eclipticCircle">
@@ -28,14 +33,26 @@ const Ecliptic = () => {
       />
       <circle
         id="sun"
-        cx={sunLocation.x}
-        cy={sunLocation.y}
+        cx={sunCoords.x}
+        cy={sunCoords.y}
         r="12"
         name="sun"
         fill="yellow"
         stroke="yellow"
         fillOpacity="1"
       />
+      {planetPart.map((p) => (
+        <circle
+          key={p.name}
+          id={p.name}
+          cx={p.x}
+          cy={p.y}
+          r={p.rad}
+          fill={p.color}
+          stroke={p.color}
+          fillOpacity="1"
+        />
+      ))}
     </g>
   );
 };
